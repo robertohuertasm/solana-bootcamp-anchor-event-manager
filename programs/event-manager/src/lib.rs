@@ -4,7 +4,7 @@ mod instructions;
 use anchor_lang::prelude::*;
 use instructions::*;
 
-declare_id!("7pyxedPb29GisxwnJhGNWoeNXUcU9JL1VQFHuHjiHAUS");
+declare_id!("6ojpS5Bg4mEHdeYyJcSutjchTqZrCVhUG2d6nWnxrZrE");
 
 #[program]
 pub mod event_manager {

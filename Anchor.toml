@@ -5,14 +5,14 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-event-manager = "7pyxedPb29GisxwnJhGNWoeNXUcU9JL1VQFHuHjiHAUS"
+event-manager = "6ojpS5Bg4mEHdeYyJcSutjchTqZrCVhUG2d6nWnxrZrE"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
 cluster = "Localnet"
-wallet = "~/.config/solana/dev.json"
+wallet = "~/.config/solana/rob.json"
 
 [scripts]
 test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 'tests/**/*.ts'"
