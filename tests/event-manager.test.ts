@@ -9,7 +9,7 @@ import {
   createMint,
 } from './utils';
 import { expect } from 'chai';
-import { getAssociatedTokenAddress } from '@solana/spl-token';
+import { getAccount, getAssociatedTokenAddress } from '@solana/spl-token';
 
 describe('event-manager', () => {
   // Configure the client to use the local cluster.
@@ -77,6 +77,10 @@ describe('event-manager', () => {
 
     await program.methods
       .createEvent(eventName, ticketPrice)
+      // .accounts({
+      //   acceptedMint,
+      //   authority: provider.wallet.publicKey,
+      // })
       .accountsPartial({
         acceptedMint,
         authority: provider.wallet.publicKey,
@@ -93,5 +97,40 @@ describe('event-manager', () => {
     expect(eventAccount).to.not.be.undefined;
     expect(eventAccount.name).to.equal(eventName);
     expect(eventAccount.ticketPrice.eq(ticketPrice)).to.be.true;
+  });
+
+  it('Alice should get 5 event tokens when sponsoring', async () => {
+    let aliceUSDCAccount = await getAccount(
+      provider.connection,
+      sponsorAliceAcceptedMintATA,
+    );
+    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(10));
+
+    const quantity = new BN(5);
+
+    await program.methods
+      .sponsorEvent(quantity)
+      .accountsPartial({
+        payerAcceptedMintAta: sponsorAliceAcceptedMintATA,
+        authority: sponsorAlice.publicKey,
+        event,
+        eventMint,
+        payerEventMintAta: sponsorAliceEventMintATA,
+        treasuryVault,
+      })
+      .signers([sponsorAlice])
+      .rpc();
+
+    const aliceEventAccount = await getAccount(
+      provider.connection,
+      sponsorAliceEventMintATA,
+    );
+    expect(aliceEventAccount.amount).to.be.equal(BigInt(5));
+
+    aliceUSDCAccount = await getAccount(
+      provider.connection,
+      sponsorAliceAcceptedMintATA,
+    );
+    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(5));
   });
 });
