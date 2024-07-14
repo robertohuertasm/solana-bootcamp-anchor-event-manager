@@ -28,22 +28,22 @@ describe('event-manager', () => {
 
     // initialize the PDAs
     event = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from('event', 'utf-8')], // seed
+      [Buffer.from('event', 'utf-8'), provider.wallet.publicKey.toBuffer()], // seed
       program.programId,
     )[0];
 
     eventMint = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from('event_mint', 'utf-8')], // seed
+      [Buffer.from('event_mint', 'utf-8'), event.toBuffer()], // seed
       program.programId,
     )[0];
 
     treasuryVault = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from('treasury_vault', 'utf-8')], // seed
+      [Buffer.from('treasury_vault', 'utf-8'), , event.toBuffer()], // seed
       program.programId,
     )[0];
 
     profitsVault = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from('profits_vault', 'utf-8')], // seed
+      [Buffer.from('profits_vault', 'utf-8'), , event.toBuffer()], // seed
       program.programId,
     )[0];
   });
