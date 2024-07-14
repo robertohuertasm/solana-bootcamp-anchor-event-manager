@@ -13,6 +13,7 @@ pub struct Event {
     pub name: String,
     pub ticket_price: u64,
     pub is_active: bool,
+    pub sponsors: u64,
 
     pub authority: Pubkey,
     pub accepted_mint: Pubkey,
