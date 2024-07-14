@@ -1,6 +1,4 @@
-use crate::collections::event::{
-    Event, SEED_EVENT, SEED_EVENT_MINT, SEED_PROFITS_VAULT, SEED_TREASURY_VAULT,
-};
+use crate::event::{Event, SEED_EVENT, SEED_EVENT_MINT, SEED_PROFITS_VAULT, SEED_TREASURY_VAULT};
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token, TokenAccount};
 

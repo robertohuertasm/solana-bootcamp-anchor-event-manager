@@ -1,5 +1,5 @@
 mod create_event;
-mod sponsor;
+mod sponsor_event;
 
 pub use create_event::*;
-pub use sponsor::*;
+pub use sponsor_event::*;

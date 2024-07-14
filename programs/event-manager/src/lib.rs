@@ -1,4 +1,4 @@
-mod collections;
+mod event;
 mod instructions;
 
 use anchor_lang::prelude::*;
@@ -15,7 +15,7 @@ pub mod event_manager {
         instructions::create_event(ctx, name, ticket_price)
     }
 
-    pub fn sponsor(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
-        instructions::sponsor(ctx, quantity)
+    pub fn sponsor_event(ctx: Context<SponsorEvent>, quantity: u64) -> Result<()> {
+        instructions::sponsor_event(ctx, quantity)
     }
 }

@@ -1,4 +1,4 @@
-use crate::collections::event::{Event, SEED_EVENT, SEED_EVENT_MINT, SEED_TREASURY_VAULT};
+use crate::event::{Event, SEED_EVENT, SEED_EVENT_MINT, SEED_TREASURY_VAULT};
 use anchor_lang::prelude::*;
 use anchor_spl::{
     associated_token::AssociatedToken,
@@ -6,7 +6,7 @@ use anchor_spl::{
 };
 
 #[derive(Accounts)]
-pub struct Sponsor<'info> {
+pub struct SponsorEvent<'info> {
     /// PDA for the event
     #[account(mut,seeds = [SEED_EVENT.as_bytes(), event.authority.key().as_ref()],  bump = event.event_bump)]
     pub event: Box<Account<'info, Event>>,
@@ -37,7 +37,7 @@ pub struct Sponsor<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn sponsor(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
+pub fn sponsor_event(ctx: Context<SponsorEvent>, quantity: u64) -> Result<()> {
     // Transfer the token from the payer's accepted mint ATA to the treasury vault
     transfer(
         CpiContext::new(
