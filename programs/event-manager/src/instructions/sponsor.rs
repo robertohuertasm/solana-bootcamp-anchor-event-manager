@@ -16,7 +16,7 @@ pub struct Sponsor<'info> {
     pub event_mint: Box<Account<'info, Mint>>,
 
     /// PDA for the treasury vault
-    #[account(mut,seeds = [SEED_TREASURY_VAULT.as_bytes(), event.key().as_ref()], bump = event.treasury_vault_bump)]
+    #[account(mut, seeds = [SEED_TREASURY_VAULT.as_bytes(), event.key().as_ref()], bump = event.treasury_vault_bump)]
     pub treasury_vault: Box<Account<'info, TokenAccount>>,
 
     /// Payer's accepted mint ATA (associated token account)
@@ -38,13 +38,6 @@ pub struct Sponsor<'info> {
 }
 
 pub fn sponsor(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
-    let seeds = [
-        SEED_EVENT.as_bytes(),
-        ctx.accounts.event.authority.as_ref(),
-        &[ctx.accounts.event.event_bump],
-    ];
-    let signer = &[&seeds[..]];
-
     // Transfer the token from the payer's accepted mint ATA to the treasury vault
     transfer(
         CpiContext::new(
@@ -59,6 +52,7 @@ pub fn sponsor(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
     )?;
 
     // Transfer the token to the payer's event mint ATA
+    // we need to use the seeds of the event PDA to sign the transaction
     mint_to(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -67,7 +61,11 @@ pub fn sponsor(ctx: Context<Sponsor>, quantity: u64) -> Result<()> {
                 to: ctx.accounts.payer_event_mint_ata.to_account_info(),
                 authority: ctx.accounts.event.to_account_info(),
             },
-            signer,
+            &[&[
+                SEED_EVENT.as_bytes(),
+                ctx.accounts.event.authority.as_ref(),
+                &[ctx.accounts.event.event_bump],
+            ]],
         ),
         quantity,
     )?;
