@@ -15,8 +15,8 @@ pub struct Event {
     pub is_active: bool,
     pub sponsors: u64,
 
-    pub authority: Pubkey,
     pub accepted_mint: Pubkey,
+    pub authority: Pubkey,
 
     // PDA bumps
     pub event_bump: u8,

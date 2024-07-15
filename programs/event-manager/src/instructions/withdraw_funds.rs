@@ -9,7 +9,7 @@ use anchor_spl::{
 #[instruction(amount: u64)]
 pub struct WithdrawFunds<'info> {
     /// PDA for the event
-    #[account(mut,seeds = [SEED_EVENT.as_bytes(), event.authority.key().as_ref()],  bump = event.event_bump)]
+    #[account(mut,seeds = [SEED_EVENT.as_bytes(), authority.key().as_ref()],  bump = event.event_bump)]
     pub event: Box<Account<'info, Event>>,
 
     pub accepted_mint: Box<Account<'info, Mint>>,

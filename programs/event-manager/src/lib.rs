@@ -26,4 +26,8 @@ pub mod event_manager {
     pub fn withdraw_funds(ctx: Context<WithdrawFunds>, amount: u64) -> Result<()> {
         instructions::withdraw_funds(ctx, amount)
     }
+
+    pub fn close_event(ctx: Context<CloseEvent>) -> Result<()> {
+        instructions::close_event(ctx)
+    }
 }
