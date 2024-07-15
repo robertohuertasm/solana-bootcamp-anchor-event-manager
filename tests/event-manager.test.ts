@@ -141,6 +141,12 @@ describe('event-manager', () => {
       sponsorAliceAcceptedMintATA,
     );
     expect(aliceUSDCAccount.amount).to.be.equal(BigInt(5));
+
+    const treasuryVaultAccount = await getAccount(
+      provider.connection,
+      treasuryVault,
+    );
+    expect(treasuryVaultAccount.amount).to.be.equal(BigInt(5));
   });
 
   it('Alice should get some tickets when buying', async () => {
