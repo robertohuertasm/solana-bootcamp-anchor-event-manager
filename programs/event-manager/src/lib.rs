@@ -22,4 +22,8 @@ pub mod event_manager {
     pub fn buy_tickets(ctx: Context<BuyTickets>, quantity: u64) -> Result<()> {
         instructions::buy_tickets(ctx, quantity)
     }
+
+    pub fn withdraw_funds(ctx: Context<WithdrawFunds>, amount: u64) -> Result<()> {
+        instructions::withdraw_funds(ctx, amount)
+    }
 }

@@ -44,9 +44,7 @@ pub fn buy_tickets(ctx: Context<BuyTickets>, quantity: u64) -> Result<()> {
             },
         ),
         amount,
-    )?;
-
-    Ok(())
+    )
 }
 
 #[error_code]
