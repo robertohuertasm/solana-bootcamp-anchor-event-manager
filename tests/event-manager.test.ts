@@ -99,7 +99,7 @@ describe('event-manager', () => {
     expect(eventAccount.ticketPrice.eq(ticketPrice)).to.be.true;
   });
 
-  it('Alice should get 5 event tokens when sponsoring', async () => {
+  it('Alice should get event tokens when sponsoring', async () => {
     let aliceUSDCAccount = await getAccount(
       provider.connection,
       sponsorAliceAcceptedMintATA,
@@ -132,5 +132,41 @@ describe('event-manager', () => {
       sponsorAliceAcceptedMintATA,
     );
     expect(aliceUSDCAccount.amount).to.be.equal(BigInt(5));
+  });
+
+  it('Alice should get some tickets when buying', async () => {
+    let aliceUSDCAccount = await getAccount(
+      provider.connection,
+      sponsorAliceAcceptedMintATA,
+    );
+    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(5));
+
+    const quantity = new BN(5);
+
+    await program.methods
+      .buyTickets(quantity)
+      .accountsPartial({
+        payerAcceptedMintAta: sponsorAliceAcceptedMintATA,
+        authority: sponsorAlice.publicKey,
+        event,
+        profitsVault,
+      })
+      .signers([sponsorAlice])
+      .rpc();
+
+    const profits_vault = await getAccount(provider.connection, profitsVault);
+    expect(profits_vault.amount).to.be.equal(BigInt(5));
+
+    aliceUSDCAccount = await getAccount(
+      provider.connection,
+      sponsorAliceAcceptedMintATA,
+    );
+    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(0));
+
+    const aliceEventAccount = await getAccount(
+      provider.connection,
+      sponsorAliceEventMintATA,
+    );
+    expect(aliceEventAccount.amount).to.be.equal(BigInt(5));
   });
 });
