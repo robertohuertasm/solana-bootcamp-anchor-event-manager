@@ -32,6 +32,9 @@ describe('event-manager', () => {
   let sponsorAliceAcceptedMintATA: PublicKey;
   let sponsorAliceEventMintATA: PublicKey;
 
+  // authority's accepted mint ATA
+  let authorityAcceptedMintAta: PublicKey;
+
   before(async () => {
     // initialize the accepted mint
     acceptedMint = await createMint(provider);
@@ -68,6 +71,12 @@ describe('event-manager', () => {
     sponsorAliceEventMintATA = await getAssociatedTokenAddress(
       eventMint,
       sponsorAlice.publicKey,
+    );
+
+    // authority's accepted mint ATA
+    authorityAcceptedMintAta = await getAssociatedTokenAddress(
+      acceptedMint,
+      provider.wallet.publicKey,
     );
   });
 
@@ -154,8 +163,11 @@ describe('event-manager', () => {
       .signers([sponsorAlice])
       .rpc();
 
-    const profits_vault = await getAccount(provider.connection, profitsVault);
-    expect(profits_vault.amount).to.be.equal(BigInt(5));
+    const profitsVaultAccount = await getAccount(
+      provider.connection,
+      profitsVault,
+    );
+    expect(profitsVaultAccount.amount).to.be.equal(BigInt(5));
 
     aliceUSDCAccount = await getAccount(
       provider.connection,
@@ -168,5 +180,36 @@ describe('event-manager', () => {
       sponsorAliceEventMintATA,
     );
     expect(aliceEventAccount.amount).to.be.equal(BigInt(5));
+  });
+
+  it('correctly withdraws funds', async () => {
+    let treasuryVaultAccount = await getAccount(
+      provider.connection,
+      treasuryVault,
+    );
+    expect(treasuryVaultAccount.amount).to.be.equal(BigInt(5));
+
+    const amount = new BN(1);
+    await program.methods
+      .withdrawFunds(amount)
+      .accountsPartial({
+        acceptedMint,
+        authority: provider.wallet.publicKey,
+
+        treasuryVault,
+        event,
+        authorityAcceptedMintAta,
+      })
+      .rpc();
+
+    treasuryVaultAccount = await getAccount(provider.connection, treasuryVault);
+    expect(treasuryVaultAccount.amount).to.be.equal(BigInt(4));
+
+    const authorityAcceptedMintAtaAccount = await getAccount(
+      provider.connection,
+      authorityAcceptedMintAta,
+    );
+
+    expect(authorityAcceptedMintAtaAccount.amount).to.be.equal(BigInt(1));
   });
 });
