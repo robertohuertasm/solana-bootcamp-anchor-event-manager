@@ -65,7 +65,7 @@ describe('event-manager', () => {
     sponsorAliceAcceptedMintATA = await createAssociatedTokenAccount(
       provider,
       acceptedMint,
-      10,
+      20,
       sponsorAlice,
     );
     sponsorAliceEventMintATA = await getAssociatedTokenAddress(
@@ -109,11 +109,11 @@ describe('event-manager', () => {
   });
 
   it('Alice should get event tokens when sponsoring', async () => {
-    let aliceUSDCAccount = await getAccount(
+    let aliceAcceptedMintAccount = await getAccount(
       provider.connection,
       sponsorAliceAcceptedMintATA,
     );
-    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(10));
+    expect(aliceAcceptedMintAccount.amount).to.be.equal(BigInt(20));
 
     const quantity = new BN(5);
 
@@ -136,11 +136,11 @@ describe('event-manager', () => {
     );
     expect(aliceEventAccount.amount).to.be.equal(BigInt(5));
 
-    aliceUSDCAccount = await getAccount(
+    aliceAcceptedMintAccount = await getAccount(
       provider.connection,
       sponsorAliceAcceptedMintATA,
     );
-    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(5));
+    expect(aliceAcceptedMintAccount.amount).to.be.equal(BigInt(15));
 
     const treasuryVaultAccount = await getAccount(
       provider.connection,
@@ -150,11 +150,11 @@ describe('event-manager', () => {
   });
 
   it('Alice should get some tickets when buying', async () => {
-    let aliceUSDCAccount = await getAccount(
+    let aliceAcceptedMintAccount = await getAccount(
       provider.connection,
       sponsorAliceAcceptedMintATA,
     );
-    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(5));
+    expect(aliceAcceptedMintAccount.amount).to.be.equal(BigInt(15));
 
     const quantity = new BN(5);
 
@@ -175,11 +175,11 @@ describe('event-manager', () => {
     );
     expect(profitsVaultAccount.amount).to.be.equal(BigInt(5));
 
-    aliceUSDCAccount = await getAccount(
+    aliceAcceptedMintAccount = await getAccount(
       provider.connection,
       sponsorAliceAcceptedMintATA,
     );
-    expect(aliceUSDCAccount.amount).to.be.equal(BigInt(0));
+    expect(aliceAcceptedMintAccount.amount).to.be.equal(BigInt(10));
 
     const aliceEventAccount = await getAccount(
       provider.connection,
@@ -217,5 +217,50 @@ describe('event-manager', () => {
     );
 
     expect(authorityAcceptedMintAtaAccount.amount).to.be.equal(BigInt(1));
+  });
+
+  it('closes the event', async () => {
+    await program.methods
+      .closeEvent()
+      .accountsPartial({
+        authority: provider.wallet.publicKey,
+
+        event,
+      })
+      .rpc();
+
+    // show new event info
+    const eventAccount = await program.account.event.fetch(event);
+    expect(eventAccount.isActive).to.be.false;
+  });
+
+  it("Alice can't buy tickets if the event is closed", async () => {
+    let error: anchor.AnchorError;
+    const quantity = new BN(2);
+    try {
+      await program.methods
+        .buyTickets(quantity)
+        .accountsPartial({
+          authority: sponsorAlice.publicKey,
+          payerAcceptedMintAta: sponsorAliceAcceptedMintATA,
+
+          event,
+          profitsVault,
+        })
+        .signers([sponsorAlice])
+        .rpc();
+      expect.fail(
+        'Expected an error when trying to buy tickets from a closed event',
+      );
+    } catch (error) {
+      expect(error).to.be.not.undefined;
+      expect(error).to.be.instanceOf(anchor.AnchorError);
+      expect((error as anchor.AnchorError).error.errorCode.code).to.be.eq(
+        'EventClosed',
+      );
+      expect((error as anchor.AnchorError).error.errorCode.number).to.be.eq(
+        program.idl.errors[0].code,
+      );
+    }
   });
 });
