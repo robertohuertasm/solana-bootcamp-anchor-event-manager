@@ -20,7 +20,7 @@ pub struct SponsorEvent<'info> {
     pub treasury_vault: Box<Account<'info, TokenAccount>>,
 
     /// Payer's accepted mint ATA (associated token account)
-    #[account(mut,constraint = payer_accepted_mint_ata.mint == event.accepted_mint,constraint = payer_accepted_mint_ata.amount > 0)]
+    #[account(mut, constraint = payer_accepted_mint_ata.mint == event.accepted_mint, constraint = payer_accepted_mint_ata.amount > 0)]
     pub payer_accepted_mint_ata: Box<Account<'info, TokenAccount>>,
 
     /// Payer's event mint ATA (associated token account)
